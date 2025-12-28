@@ -1,0 +1,291 @@
+{% assign locationOrigin = request.origin | append: routes.root_url | split: '/' | join: '/' %}
+
+<section class="action-section">
+  <div class="action-container">
+    <div class="action-content">
+      <!-- Left Side - Text Content -->
+      <div class="action-text">
+        <h2 class="action-heading">
+          {{ section.settings.heading_part1 }}
+          <em class="action-italic">{{ section.settings.heading_part2 }}</em>
+        </h2>
+      </div>
+
+      <!-- Right Side - Tabs -->
+      <div class="action-tabs">
+        <div class="tabs-header">
+          {% for block in section.blocks %}
+            <button 
+              class="tab-button {% if forloop.first %}active{% endif %}"
+              data-tab="{{ forloop.index }}"
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.tab_label }}
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Video/Image Content Area -->
+    <div class="action-media">
+      {% for block in section.blocks %}
+        <div 
+          class="tab-content {% if forloop.first %}active{% endif %}"
+          data-content="{{ forloop.index }}"
+        >
+          {% if block.settings.video_url != blank %}
+            <video 
+              class="action-video"
+              autoplay 
+              loop 
+              muted 
+              playsinline
+            >
+              <source src="{{ block.settings.video_url }}" type="video/mp4">
+            </video>
+          {% elsif block.settings.image != blank %}
+            <img 
+              src="{{ block.settings.image | image_url: width: 1200 }}" 
+              alt="{{ block.settings.tab_label }}"
+              class="action-image"
+            >
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const tabNumber = this.getAttribute('data-tab');
+
+        // Remove active class from all buttons and contents
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+
+        // Add active class to clicked button and corresponding content
+        this.classList.add('active');
+        document.querySelector(`[data-content="${tabNumber}"]`).classList.add('active');
+      });
+    });
+  });
+</script>
+
+{% stylesheet %}
+  .action-section {
+    padding: 60px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .action-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .action-content {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: flex-start;
+  }
+
+  .action-text {
+    max-width: 600px;
+  }
+
+  .action-heading {
+    font-size: 48px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+  }
+
+  .action-italic {
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .action-tabs {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .tabs-header {
+    display: flex;
+    gap: 8px;
+    border: 1px solid #f5f5f5;
+    padding: 6px;
+    border-radius: 8px;
+  }
+
+  .tab-button {
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #666;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .tab-button:hover {
+    color: #000;
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .tab-button.active {
+    color: #fff;
+    background: #6b5dd3;
+    box-shadow: 0 2px 8px rgba(107, 93, 211, 0.3);
+  }
+
+  .action-media {
+    position: relative;
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    background: #f0f0f0;
+  }
+
+  .tab-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+
+  .tab-content.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .action-video,
+  .action-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media screen and (max-width: 768px) {
+    .action-section {
+      padding: 40px 16px;
+    }
+
+    .action-content {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .action-heading {
+      font-size: 32px;
+    }
+
+    .tabs-header {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-button {
+      padding: 10px 20px;
+      font-size: 14px;
+    }
+
+    .action-media {
+      aspect-ratio: 4/3;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "See it in Action",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading_part1",
+      "label": "Heading Part 1 (Bold)",
+      "default": "See it in action."
+    },
+    {
+      "type": "text",
+      "id": "heading_part2",
+      "label": "Heading Part 2 (Italic)",
+      "default": "No matter the terrain, the eraser hugs your curves."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_label",
+          "label": "Tab Label",
+          "default": "Bikini"
+        },
+        {
+          "type": "url",
+          "id": "video_url",
+          "label": "Video URL (MP4)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image (if no video)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "See it in Action",
+      "blocks": [
+        {
+          "type": "tab",
+          "settings": {
+            "tab_label": "Bikini"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "tab_label": "Leg"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "tab_label": "Arm"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "tab_label": "Back"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

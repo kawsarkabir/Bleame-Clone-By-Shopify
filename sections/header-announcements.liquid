@@ -1,0 +1,388 @@
+{% if section.blocks.size > 1 %}
+  <script
+    src="{{ 'announcement-bar.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+{% endif %}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<aside
+  class="announcement-bar spacing-style section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}"
+  style="{% render 'spacing-padding', settings: section.settings %}; --border-bottom-width: {{ section.settings.divider_width }}px;"
+>
+  {% liquid
+    assign autoplay = false
+    assign show_arrows = false
+    if section.blocks.size > 1
+      assign autoplay = true
+      assign show_arrows = true
+    endif
+  %}
+
+  <announcement-bar-component
+    class="announcement-bar__slider"
+    {% if autoplay == true %}
+      autoplay="{{ section.settings.speed }}" aria-live="polite"
+    {% endif %}
+  >
+    {% if show_arrows %}
+      {% render 'slideshow-arrows', icon_style: 'chevron' %}
+    {% endif %}
+
+    <div class="announcement-bar__slides">
+      {% for block in section.blocks %}
+        <div class="announcement-bar__slide" {{ block.shopify_attributes }}>
+          <div class="announcement-bar__content">
+            {% if block.settings.show_tree_left %}
+              <span class="announcement-bar__icon">🎄</span>
+            {% endif %}
+            
+            <span class="announcement-bar__text">{{ block.settings.announcement_text }}</span>
+            {% if block.settings.show_tree_right %}
+              <span class="announcement-bar__icon">🎄</span>
+            {% endif %}
+            
+            {% if block.settings.show_countdown %}
+              <div class="announcement-bar__countdown">
+                <div class="countdown-box">
+                  <span class="countdown-number" data-countdown-days>01</span>
+                  <span class="countdown-label">HRS</span>
+                </div>
+                <span class="countdown-separator">:</span>
+                <div class="countdown-box">
+                  <span class="countdown-number" data-countdown-hours>09</span>
+                  <span class="countdown-label">MIN</span>
+                </div>
+                <span class="countdown-separator">:</span>
+                <div class="countdown-box">
+                  <span class="countdown-number" data-countdown-minutes>10</span>
+                  <span class="countdown-label">SEC</span>
+                </div>
+              </div>
+            {% endif %}
+            
+            
+          </div>
+          
+          {% if block.settings.link != blank %}
+            <a href="{{ block.settings.link }}" class="announcement-bar__link"></a>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </announcement-bar-component>
+</aside>
+
+<script>
+  // Countdown Timer
+  if (document.querySelector('[data-countdown-days]')) {
+    function updateCountdown() {
+      const endDate = new Date('2026-12-25T23:59:59').getTime();
+      const now = new Date().getTime();
+      const distance = endDate - now;
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.querySelectorAll('[data-countdown-days]').forEach(el => {
+        el.textContent = String(hours).padStart(2, '0');
+      });
+      document.querySelectorAll('[data-countdown-hours]').forEach(el => {
+        el.textContent = String(minutes).padStart(2, '0');
+      });
+      document.querySelectorAll('[data-countdown-minutes]').forEach(el => {
+        el.textContent = String(seconds).padStart(2, '0');
+      });
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  }
+</script>
+
+{% stylesheet %}
+  .announcement-bar {
+    border-block-end: var(--border-bottom-width) solid var(--color-border);
+   background: rgb(var(--color-background));
+  }
+
+  .announcement-bar__slider {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+
+    @media screen and (max-width: 749px) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .announcement-bar__slides {
+    display: grid;
+    grid: [stack] auto / [stack] auto;
+    width: calc(100% - var(--button-size) * 2);
+    max-width: 100%;
+    margin-inline: auto;
+  }
+
+  .announcement-bar__slides > * {
+    grid-area: stack;
+  }
+
+  .announcement-bar__slide {
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+    position: relative;
+
+    &[aria-hidden='true'] {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  .announcement-bar__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .announcement-bar__icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .announcement-bar__text {
+   color: rgb(var(--color-foreground));
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .announcement-bar__countdown {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .countdown-box {
+    background: rgb(var(--color-background));
+    border-radius: 4px;
+    padding: 4px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 50px;
+  }
+
+  .countdown-number {
+color: rgb(var(--color-foreground));
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .countdown-label {
+ color: rgb(var(--color-foreground));
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-top: 2px;
+  }
+
+  .countdown-separator {
+color: rgb(var(--color-foreground));
+    font-weight: 700;
+    font-size: 18px;
+    margin: 0 2px;
+  }
+
+  .announcement-bar__slider slideshow-arrows {
+    padding: 0;
+    mix-blend-mode: normal;
+  }
+
+  .announcement-bar__slider slideshow-arrows .slideshow-control {
+color: rgb(var(--color-foreground));
+  }
+
+  .announcement-bar__slider .slideshow-control {
+    display: flex;
+    padding: 0;
+    width: var(--button-size);
+    height: var(--button-size);
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    animation: none;
+
+    @media screen and (min-width: 750px) {
+      --slideshow-control-offset: calc((var(--button-size) - var(--icon-size-xs)) / 2);
+
+      .section--page-width &.slideshow-control--previous {
+        transform: translateX(var(--slideshow-control-offset));
+      }
+    }
+  }
+
+  .announcement-bar__slider .slideshow-control .svg-wrapper {
+    width: var(--icon-size-xs);
+    height: var(--icon-size-xs);
+  }
+
+  .announcement-bar__link {
+    position: absolute;
+    inset: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .announcement-bar__text {
+      font-size: 13px;
+    }
+    
+    .countdown-box {
+      min-width: 42px;
+      padding: 3px 6px;
+    }
+    
+    .countdown-number {
+      font-size: 14px;
+    }
+    
+    .countdown-label {
+      font-size: 8px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.announcement_bar",
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement",
+      "settings": [
+        {
+          "type": "text",
+          "id": "announcement_text",
+          "label": "Announcement Text",
+          "default": "CHRISTMAS SALE ENDS IN"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_countdown",
+          "label": "Show Countdown Timer",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_tree_left",
+          "label": "Show Tree Icon (Left)",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_tree_right",
+          "label": "Show Tree Icon (Right)",
+          "default": true
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "t:settings.scroll_speed",
+      "min": 2,
+      "max": 10,
+      "default": 5,
+      "unit": "sec"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.section_width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "full-width"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-4",
+      "label": "t:settings.color_scheme"
+    },
+    {
+      "type": "range",
+      "id": "divider_width",
+      "label": "t:settings.divider_thickness",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "Christmas Announcement Bar",
+      "blocks": [
+        {
+          "type": "announcement"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

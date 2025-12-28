@@ -1,0 +1,138 @@
+{% comment %}
+  Customer Testimonial Quote Section
+  Place this in: sections/testimonial-quote.liquid
+{% endcomment %}
+
+<div class="testimonial-quote-section color-{{ section.settings.color_scheme }}">
+  <div class="testimonial-quote-container">
+    {% if section.settings.quote_text != blank %}
+      <blockquote class="testimonial-quote">
+        {{ section.settings.quote_text }}
+      </blockquote>
+    {% endif %}
+
+    {% if section.settings.author_name != blank %}
+      <p class="testimonial-author">
+        {{ section.settings.author_name }}
+        {% if section.settings.show_verified_badge %}
+          <span class="verified-badge">-Verified Buyer</span>
+        {% endif %}
+      </p>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+    .testimonial-quote-section {
+      width: 100%;
+      padding: 80px 20px;
+      background: radial-gradient(rgba(180, 152, 215, 1) 23%, rgba(233, 183, 230, 1) 97%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 290px;
+    }
+
+    .testimonial-quote-container {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .testimonial-quote {
+      color: #ffffff;
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1.6;
+      margin: 0 0 20px;
+      padding: 0;
+      border: none;
+    }
+
+    .testimonial-author {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 16px;
+      font-weight: 400;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .verified-badge {
+      font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .testimonial-quote-section {
+        padding: 60px 24px;
+        min-height: 240px;
+      }
+
+      .testimonial-quote {
+        font-size: 18px;
+        line-height: 1.5;
+        margin-bottom: 16px;
+      }
+
+      .testimonial-author {
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .testimonial-quote-section {
+        padding: 50px 20px;
+      }
+
+      .testimonial-quote {
+        font-size: 16px;
+      }
+
+      .testimonial-author {
+        font-size: 13px;
+      }
+    }
+</style>
+
+{% schema %}
+{
+  "name": "Testimonial Quote",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "quote_text",
+      "label": "Testimonial Quote",
+      "default": "Easily my best purchase of the year. It was painless and didn't cause any friction even when it was rubbed on the skin. I highly recommend."
+    },
+    {
+      "type": "text",
+      "id": "author_name",
+      "label": "Customer Name",
+      "default": "Jane M."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_verified_badge",
+      "label": "Show 'Verified Buyer' Badge",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "scheme-1",
+      "info": "Note: The purple gradient background is built-in. Color scheme affects text color only."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonial Quote",
+      "settings": {
+        "quote_text": "Easily my best purchase of the year. It was painless and didn't cause any friction even when it was rubbed on the skin. I highly recommend.",
+        "author_name": "Jane M.",
+        "show_verified_badge": true
+      }
+    }
+  ]
+}
+{% endschema %}

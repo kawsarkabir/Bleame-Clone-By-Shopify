@@ -1,0 +1,116 @@
+<aside class="announcement-topbar color-{{ section.settings.color_scheme }}">
+  <div class="page-width announcement-topbar__inner">
+
+    <div class="announcement-item">
+      <span class="announcement-icon">
+        {{ section.settings.icon_1 }}
+      </span>
+      <span class="announcement-text">
+        {{ section.settings.text_1 }}
+      </span>
+    </div>
+
+    <span class="announcement-separator">•</span>
+
+    <div class="announcement-item">
+      <span class="announcement-icon">
+        {{ section.settings.icon_2 }}
+      </span>
+      <span class="announcement-text">
+        {{ section.settings.text_2 }}
+      </span>
+    </div>
+
+  </div>
+</aside>
+
+{% stylesheet %}
+.announcement-topbar {
+  background: rgb(var(--color-background));
+  color: rgb(var(--color-foreground));
+  font-size: 16px;
+}
+
+.announcement-topbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 8px 0;
+  white-space: nowrap;
+}
+
+.announcement-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.announcement-icon {
+  display: flex;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.announcement-text {
+  font-weight: 800;
+  
+}
+
+.announcement-separator {
+  opacity: 0.6;
+}
+
+/* Mobile */
+@media (max-width: 749px) {
+  .announcement-topbar {
+    font-size: 12px;
+  }
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Announcement Top Bar",
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-4"
+    },
+    {
+      "type": "text",
+      "id": "icon_1",
+      "label": "Icon 1",
+      "default": "🚚"
+    },
+    {
+      "type": "text",
+      "id": "text_1",
+      "label": "Text 1",
+      "default": "Free Shipping Today"
+    },
+    {
+      "type": "text",
+      "id": "icon_2",
+      "label": "Icon 2",
+      "default": "❤️"
+    },
+    {
+      "type": "text",
+      "id": "text_2",
+      "label": "Text 2",
+      "default": "175,000+ Happy Babes"
+    }
+  ],
+  "presets": [
+    {
+      "name": "One Line Announcement Bar"
+    }
+  ]
+}
+{% endschema %}

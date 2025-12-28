@@ -1,0 +1,567 @@
+{% comment %}
+  Product Card Section with Dynamic Image Slider
+  Place this in: sections/product-card-slider.liquid
+{% endcomment %}
+
+<div class="product-card-section">
+  <div class="container">
+    <h2 class="section-heading">{{ section.settings.heading }}</h2>
+
+    <div class="product-card-wrapper">
+      {% if section.settings.product != blank %}
+        {% assign product = section.settings.product %}
+
+        <div class="product-card" data-product-id="{{ product.id }}">
+          <!-- Product Card Container -->
+          <div class="product-card__container">
+            <!-- Image Slider with Badge and Dots Inside -->
+            <div class="product-card__image-slider">
+              <a href="{{ product.url }}" class="image-link">
+                <!-- Slider Track -->
+                <div class="slider-track" data-slider-track>
+                  {% if product.images.size > 0 %}
+                    {% for image in product.images %}
+                      <div
+                        class="slider-slide {% if forloop.first %}active{% endif %}"
+                        data-slide-index="{{ forloop.index0 }}"
+                      >
+                        <img
+                          src="{{ image | img_url: '800x800', crop: 'center' }}"
+                          alt="{{ image.alt | default: product.title | escape }}"
+                          loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                          width="800"
+                          height="800"
+                        >
+                      </div>
+                    {% endfor %}
+                  {% else %}
+                    <div class="slider-slide active">
+                      {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <!-- Slider Dots Inside Image -->
+                {% if product.images.size > 1 %}
+                  <div class="slider-dots">
+                    {% for image in product.images %}
+                      <span
+                        class="dot {% if forloop.first %}active{% endif %}"
+                        data-slide-to="{{ forloop.index0 }}"
+                        aria-label="Go to slide {{ forloop.index }}"
+                      ></span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </a>
+            </div>
+
+            <!-- Add to Cart Button -->
+            <button
+              class="add-to-cart-btn"
+              data-product-id="{{ product.selected_or_first_available_variant.id }}"
+            >
+              ADD TO CART +
+            </button>
+          </div>
+
+          <!-- Product Info Below Card -->
+          <div class="product-info">
+            <a href="{{ product.url }}" class="info-link">
+              <!-- Star Rating -->
+              {% if section.settings.show_reviews %}
+                <div class="rating-wrapper">
+                  <div class="stars">
+                    {% for i in (1..5) %}
+                      <svg class="star-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                      </svg>
+                    {% endfor %}
+                  </div>
+                  <span class="review-count">{{ section.settings.review_count }} Reviews</span>
+                </div>
+              {% endif %}
+
+              <!-- Product Title -->
+              <h3 class="product-title">{{ product.title }}</h3>
+
+              <!-- Price -->
+              <div class="price-wrapper">
+                {% if product.compare_at_price > product.price %}
+                  <div>
+                    <span class="price-original">${{ product.compare_at_price | money_without_currency }}</span>
+                    <span class="price-sale">${{ product.price | money_without_currency }}</span>
+                  </div>
+                  {% assign savings = product.compare_at_price
+                    | minus: product.price
+                    | times: 100.0
+                    | divided_by: product.compare_at_price
+                    | round
+                  %}
+                  <span class="savings-badge">SAVE {{ savings }}%</span>
+                {% else %}
+                  <span class="price-regular">${{ product.price | money_without_currency }}</span>
+                {% endif %}
+              </div>
+            </a>
+          </div>
+        </div>
+      {% else %}
+        <p class="empty-state">Please select a product in the theme customizer.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  .product-card-section {
+    background: #2e2a39;
+    padding: 60px 20px;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .container {
+       margin: auto;
+  }
+
+  .section-heading {
+    color: #ffffff;
+    font-size: 36px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 0 50px;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+  }
+
+  .product-card-wrapper {
+
+       max-width: 286px;
+    margin: 0 auto;
+     width: 100%;
+  }
+
+  .product-card {
+    width: 100%;
+  }
+
+  /* Product Card Container with rounded corners */
+  .product-card__container {
+    background: #d6d2ff;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    width: 286px;
+    height: 336px;
+    margin: 0 auto;
+  }
+
+  /* Image Slider */
+  .product-card__image-slider {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+  }
+
+  .image-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+  }
+
+  .slider-track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .slider-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slider-slide.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 1;
+  }
+
+  .slider-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+
+  /* Slider Dots */
+  .slider-dots {
+    position: absolute;
+    bottom: 13px;
+    left: 70%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+    padding: 0;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+  }
+
+  .dot.active {
+    background: #ffffff;
+    width: 12px;
+    height: 12px;
+  }
+
+  .dot:hover {
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Add to Cart Button */
+  .add-to-cart-btn {
+    width: 100%;
+    padding: 18px;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+
+  }
+
+  .add-to-cart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .add-to-cart-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Product Info Below Card */
+  .product-info {
+    text-align: left;
+  }
+
+  .info-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .rating-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    gap: 10px;
+   padding-top: 10px;
+  }
+
+  .stars {
+    display: flex;
+    gap: 3px;
+  }
+
+  .star-icon {
+    color: #8b7ab8;
+    width: 18px;
+    height: 18px;
+  }
+
+  .review-count {
+    color: #b8b8c8;
+    font-size: 15px;
+    font-weight: 400;
+  }
+
+  .product-title {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: left;
+    line-height: 1.3;
+    margin: 0;
+    padding: 10px 0;
+  }
+
+  .price-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .price-original {
+    color: #8b8b9b;
+    text-decoration: line-through;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .price-sale {
+    color: #b8a4e8;
+    font-size: 18px;
+    font-weight: 700;
+        padding-left: 5px;
+  }
+
+  .price-regular {
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .savings-badge {
+   background: #5a4a7a;
+    color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .empty-state {
+    color: #b8b8c8;
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 16px;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .product-card-section {
+      padding: 40px 16px;
+    }
+
+    .section-heading {
+      font-size: 28px;
+      margin-bottom: 32px;
+    }
+
+    .product-title {
+      font-size: 18px;
+    }
+
+    .price-sale,
+    .price-regular {
+      font-size: 24px;
+    }
+
+    .promo-badge {
+      font-size: 9px;
+      padding: 8px 14px;
+      top: 16px;
+      left: 16px;
+    }
+
+    .slider-slide {
+      padding: 40px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .section-heading {
+      font-size: 24px;
+    }
+
+    .slider-slide {
+      padding: 30px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Image Slider Functionality
+    const sliderTracks = document.querySelectorAll('[data-slider-track]');
+
+    sliderTracks.forEach((track) => {
+      const slides = track.querySelectorAll('.slider-slide');
+      const dots = track.parentElement.querySelectorAll('.dot');
+      let currentSlide = 0;
+      let autoPlayInterval;
+      let isHovering = false;
+
+      if (slides.length <= 1) return;
+
+      function goToSlide(index) {
+        slides[currentSlide].classList.remove('active');
+        if (dots[currentSlide]) {
+          dots[currentSlide].classList.remove('active');
+        }
+
+        currentSlide = index;
+
+        slides[currentSlide].classList.add('active');
+        if (dots[currentSlide]) {
+          dots[currentSlide].classList.add('active');
+        }
+      }
+
+      function nextSlide() {
+        const next = (currentSlide + 1) % slides.length;
+        goToSlide(next);
+      }
+
+      function startAutoPlay() {
+        stopAutoPlay();
+        autoPlayInterval = setInterval(() => {
+          if (!isHovering) {
+            nextSlide();
+          }
+        }, 3000);
+      }
+
+      function stopAutoPlay() {
+        if (autoPlayInterval) {
+          clearInterval(autoPlayInterval);
+        }
+      }
+
+      // Dot navigation with click events
+      dots.forEach((dot) => {
+        dot.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const slideIndex = parseInt(dot.getAttribute('data-slide-to'));
+          goToSlide(slideIndex);
+          startAutoPlay();
+        });
+      });
+
+      // Pause on hover
+      const sliderContainer = track.parentElement;
+      sliderContainer.addEventListener('mouseenter', () => {
+        isHovering = true;
+      });
+
+      sliderContainer.addEventListener('mouseleave', () => {
+        isHovering = false;
+      });
+
+      // Start autoplay
+      startAutoPlay();
+    });
+
+    // Add to Cart Functionality
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+
+    addToCartButtons.forEach((button) => {
+      button.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const variantId = this.getAttribute('data-product-id');
+        const originalText = this.textContent;
+
+        if (!variantId) {
+          console.error('No variant ID found');
+          return;
+        }
+
+        // Update button state
+        this.textContent = 'ADDING...';
+        this.disabled = true;
+
+        // Add to cart via AJAX
+        fetch('/cart/add.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: variantId,
+            quantity: 1,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            this.textContent = 'ADDED ✓';
+            setTimeout(() => {
+              window.location.href = '/cart';
+            }, 500);
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+            this.textContent = originalText;
+            this.disabled = false;
+            alert('Error adding to cart. Please try again.');
+          });
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Product Card Slider",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Indulge in skin softness"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Select Product"
+    },
+    {
+      "type": "text",
+      "id": "promo_text",
+      "label": "Promotional Text",
+      "default": "FREE GLEAM BODY SCRUB OFFER ENDS TODAY"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reviews",
+      "label": "Show Reviews",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "review_count",
+      "label": "Review Count",
+      "default": "6737"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Card Slider"
+    }
+  ]
+}
+{% endschema %}
